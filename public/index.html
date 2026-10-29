@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>School Portal</title>
+  <style>
+    body { font-family: sans-serif; background: #f3f4f6; padding: 20px; }
+    .card { background: white; padding: 20px; border-radius: 8px; max-width: 500px; margin: 0 auto 20px; box-shadow: 0 4px 6px rgba(0,0,0,0.1); }
+    button { background: #0284c7; color: white; border: none; padding: 12px; border-radius: 6px; cursor: pointer; width: 100%; margin: 5px 0; }
+    textarea { width: 95%; padding: 10px; border-radius: 6px; margin-top: 10px; }
+  </style>
+</head>
+<body>
+
+  <!-- Teacher Dashboard -->
+  <div class="card" id="teacher-view">
+    <h2>Teacher Portal: Choose a Class</h2>
+    <button onclick="openForm('Form 1')">Form One</button>
+    <button onclick="openForm('Form 2')">Form Two</button>
+    <button onclick="openForm('Form 3')">Form Three</button>
+    <button onclick="openForm('Form 4')">Form Four</button>
+    <button onclick="openForm('Form 5')">Form Five</button>
+    <button onclick="openForm('Form 6')">Form Six</button>
+  </div>
+
+  <!-- Grading Sheet -->
+  <div class="card" id="grade-view" style="display:none;">
+    <h2 id="form-title"></h2>
+    <textarea id="results-data" rows="6" placeholder="Student Name - Marks"></textarea>
+    <button onclick="submitResults()">Submit</button>
+    <button onclick="goBack()" style="background:#4b5563;">Back</button>
+  </div>
+
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
+    import { getFirestore, doc, setDoc } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+
+    // Your specific project config (Find this in your Firebase Console Settings)
+    const firebaseConfig = {
+      projectId: "kasange-result-project",
+      authDomain: "kasange-result-project.firebaseapp.com",
+    };
+    const app = initializeApp(firebaseConfig);
+    const db = getFirestore(app);
+
+    window.openForm = (formName) => {
+      document.getElementById('teacher-view').style.display = 'none';
+      document.getElementById('grade-view').style.display = 'block';
+      document.getElementById('form-title').innerText = formName;
+    }
+
+    window.goBack = () => {
+      document.getElementById('teacher-view').style.display = 'block';
+      document.getElementById('grade-view').style.display = 'none';
+    }
+
+    window.submitResults = async () => {
+      const form = document.getElementById('form-title').innerText;
+      const data = document.getElementById('results-data').value;
+      await setDoc(doc(db, "results", form), { content: data });
+      alert("Success! Uploaded to Firestore.");
+      goBack();
+    }
+  </script>
+</body>
+</html>
